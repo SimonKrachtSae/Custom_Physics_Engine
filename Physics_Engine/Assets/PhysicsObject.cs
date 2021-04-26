@@ -11,9 +11,9 @@ public class PhysicsObject : MonoBehaviour
     public float ySize { get => transform.lossyScale.y; }
     public float zSize { get => transform.lossyScale.z; }
 
-    public float xHalfSize { get => transform.lossyScale.x / 2; }
-    public float yHalfSize { get => transform.lossyScale.y / 2; }
-    public float zHalfSize { get => transform.lossyScale.z / 2; }
+    public float xHalfSize { get => transform.lossyScale.x / 2.0f; }
+    public float yHalfSize { get => transform.lossyScale.y / 2.0f; }
+    public float zHalfSize { get => transform.lossyScale.z / 2.0f; }
 
 
     public Vector3 closestPoint;

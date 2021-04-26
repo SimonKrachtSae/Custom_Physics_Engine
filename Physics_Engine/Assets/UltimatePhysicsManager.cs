@@ -13,6 +13,8 @@ public class UltimatePhysicsManager : MonoBehaviour
     private Vector3 directionBetweenSphereAndAabb = new Vector3();
     private Vector3 closestPointBetweenSphereAndAabb = new Vector3();
 
+    public Sphere Sphere;
+    public AABB AABB;
     private void Awake()
     {
 
@@ -31,6 +33,7 @@ public class UltimatePhysicsManager : MonoBehaviour
         {
             for(int j = i + 1; j < physicalObjects.Count; j++)
             {
+                closestPointBetweenSphereAndAabb = Vector3.zero;
                 CheckForCollision(physicalObjects[i], physicalObjects[j]);
             }
         }
@@ -100,7 +103,7 @@ public class UltimatePhysicsManager : MonoBehaviour
     }
     private void CheckForCollisionBetweenSphereAndAabb(PhysicsObject sphere, PhysicsObject aabb)
     {
-        SetClosestPoint(sphere,aabb);
+        SetClosestPointBetweenSphereAndAabb(sphere,aabb);
         float distance = Vector.GetDirectionVector(sphere.transform.position, closestPointBetweenSphereAndAabb).magnitude - sphere.radius;
         if (distance < 0)
         {
@@ -120,16 +123,17 @@ public class UltimatePhysicsManager : MonoBehaviour
     private void ApplyCollision(PhysicsObject sphere, PhysicsObject aabb)
     {
         float CollisionForce = sphere.Speed * sphere.rb.mass;
-        Vector3 delta = sphere.transform.position - aabb.transform.position;
+        Vector3 delta = sphere.transform.position - closestPointBetweenSphereAndAabb;
         Vector3 normal = delta * CollisionForce;
         sphere.rb.linearAcceleration = normal * sphere.rb.inverseMass;
     }
-    private void SetClosestPoint(PhysicsObject sphere, PhysicsObject aabb)
+    private void SetClosestPointBetweenSphereAndAabb(PhysicsObject sphere, PhysicsObject aabb)
     {
-        Matrix trs = Matrix.TRS(aabb.transform.position, aabb.transform.localEulerAngles, aabb.transform.lossyScale);
+        //Matrix trs = Matrix.TRS(aabb.transform.position, aabb.transform.localEulerAngles, aabb.transform.lossyScale);
         closestPointBetweenSphereAndAabb = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
         closestPointBetweenSphereAndAabb = new Vector3(Mathf.Clamp(closestPointBetweenSphereAndAabb.x, -aabb.xHalfSize, aabb.xHalfSize), Mathf.Clamp(closestPointBetweenSphereAndAabb.y, -aabb.yHalfSize, aabb.yHalfSize), Mathf.Clamp(closestPointBetweenSphereAndAabb.z, -aabb.zHalfSize, aabb.zHalfSize));
-        closestPointBetweenSphereAndAabb = trs * closestPointBetweenSphereAndAabb;
+        //closestPointBetweenSphereAndAabb = trs * closestPointBetweenSphereAndAabb;
+        closestPointBetweenSphereAndAabb = aabb.transform.position + closestPointBetweenSphereAndAabb;
     }
 
     public void AddRigidbody(PhysicsObject physicsObject)
@@ -150,4 +154,15 @@ public class UltimatePhysicsManager : MonoBehaviour
             return;
         physicalObjects.Add(physicsObject);
     }
+    //private void OnDrawGizmos()
+    //{
+    //    Vector3 point;
+    //   // Matrix trs = Matrix.TRS(AABB.transform.position, AABB.transform.localEulerAngles, AABB.transform.lossyScale);
+    //    point = Vector.GetDirectionVector(AABB.transform.position, Sphere.transform.position);
+    //    point = new Vector3(Mathf.Clamp(point.x, -AABB.xHalfSize, AABB.xHalfSize), Mathf.Clamp(point.y, -AABB.yHalfSize, AABB.yHalfSize), Mathf.Clamp(point.z, -AABB.zHalfSize, AABB.zHalfSize));
+    //    // point = trs * point;
+    //    point = AABB.transform.position + point;
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawSphere(point, 0.1f);
+    //}
 }
