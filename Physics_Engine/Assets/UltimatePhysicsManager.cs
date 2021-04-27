@@ -6,12 +6,9 @@ public class UltimatePhysicsManager : MonoBehaviour
 {
     public static UltimatePhysicsManager Instance { get; private set; }
     public List<PhysicsObject> physicalObjects;
-    public Vector3 directionBetweenSpheres;
-    public float realDistance;
-
-    private bool isSphereAndAabbColliding = false;
+    private bool isColliding = false;
     private Vector3 directionBetweenSphereAndAabb = new Vector3();
-    private Vector3 closestPointBetweenSphereAndAabb = new Vector3();
+    private Vector3 closestPoint = new Vector3();
 
     public Sphere Sphere;
     public AABB AABB;
@@ -33,110 +30,115 @@ public class UltimatePhysicsManager : MonoBehaviour
         {
             for(int j = i + 1; j < physicalObjects.Count; j++)
             {
-                closestPointBetweenSphereAndAabb = Vector3.zero;
+                closestPoint = Vector3.zero;
                 CheckForCollision(physicalObjects[i], physicalObjects[j]);
             }
         }
     }
     private void CheckForCollision(PhysicsObject a, PhysicsObject b)
     {
+        if (a.isTrigger || b.isTrigger)
+            return;
+
         if(a is Sphere)
         {
             if(b is AABB)
             {
-                GenerateCollisionBetweenSphereAndAabb(a, b);
+                GenerateCollision((Sphere)a, (AABB)b);
             }
             else if(b is Sphere)
             {
-                GenerateCollisionBetweenSpheres(a, b);
+                GenerateCollision((Sphere)a, (Sphere)b);
             }
         }
-        else if(a is AABB)
+        else if(a is AABB )
         {
             if(b is Sphere)
             {
-                GenerateCollisionBetweenSphereAndAabb(b, a);
+                GenerateCollision((Sphere)b, (AABB)a);
             }
-            //if(a is AABB)
-            //{
-            //    return;
-            //}
         }
     }
-    private void GenerateCollisionBetweenSpheres(PhysicsObject a, PhysicsObject b)
+
+    #region SphereToShereCollision
+    private void GenerateCollision(Sphere a, Sphere b)
     {
-        directionBetweenSpheres = Vector.GetDirectionVector(a.transform.position,b.transform.position);
-        CheckDistanceBetweenSpheres(a,b);
+        Vector3 direction = Vector.GetDirectionVector(a.transform.position,b.transform.position);
+        CheckDistance(a,b, direction);
     }
-    private void ApplyCollisionOnSpheres(PhysicsObject a, PhysicsObject b)
+    private void CheckDistance(Sphere a, Sphere b,Vector3 direction)
     {
-        float collisionForce = a.Speed * a.rb.mass + b.Speed * b.rb.mass;
-        Vector3 delta = (directionBetweenSpheres + a.rb.linearAcceleration + b.rb.linearAcceleration).normalized;
-        Vector3 normal = delta * collisionForce;
-        a.rb.linearAcceleration = -normal * a.rb.inverseMass;
-        b.rb.linearAcceleration = normal * b.rb.inverseMass;
-    }
-    private void SeperateSpheres(PhysicsObject a, PhysicsObject b)
-    {
-        Vector3 seperationPoint = b.transform.position - directionBetweenSpheres.normalized * (a.radius + b.radius);
-        a.transform.position = seperationPoint;
-    }
-    private void CheckDistanceBetweenSpheres(PhysicsObject a, PhysicsObject b)
-    {
-        float middlepointDistance = directionBetweenSpheres.magnitude;
-        realDistance = middlepointDistance - a.radius - b.radius;
+        float middlepointDistance = direction.magnitude;
+        float realDistance = middlepointDistance - a.radius - b.radius;
         
         if (realDistance < 0)
         {
-            SeperateSpheres(a, b);
-            ApplyCollisionOnSpheres(a, b);
+            Seperate(a, b, direction);
+            ApplyCollision(a, b, direction);
         }
     }
-    private void GenerateCollisionBetweenSphereAndAabb(PhysicsObject sphere, PhysicsObject aabb)
+    private void Seperate(Sphere a, Sphere b, Vector3 direction)
     {
-        CheckForCollisionBetweenSphereAndAabb(sphere,aabb);
-        if (isSphereAndAabbColliding)
+        Vector3 seperationPoint = b.transform.position - direction.normalized * (a.radius + b.radius);
+        a.transform.position = seperationPoint;
+    }
+    private void ApplyCollision(Sphere a, Sphere b, Vector3 direction)
+    {
+        float collisionForce = a.rb.LinearVelocity.magnitude * a.rb.mass + b.rb.LinearVelocity.magnitude * b.rb.mass;
+        Vector3 delta = (direction + a.rb.LinearVelocity + b.rb.LinearVelocity).normalized;
+        Vector3 normal = delta * collisionForce;
+        a.rb.LinearVelocity = -normal * a.rb.inverseMass;
+        b.rb.LinearVelocity = normal * b.rb.inverseMass;
+    }
+    #endregion
+    
+    #region SphereToAABBCollision
+    private void GenerateCollision(Sphere sphere, AABB aabb)
+    {
+         isColliding = false;
+        CheckForCollision(sphere,aabb);
+        if (isColliding)
         {
             Seperate(sphere, aabb);
             ApplyCollision(sphere, aabb);
         }
     }
-    private void CheckForCollisionBetweenSphereAndAabb(PhysicsObject sphere, PhysicsObject aabb)
+    private void CheckForCollision(Sphere sphere, AABB aabb)
     {
-        SetClosestPointBetweenSphereAndAabb(sphere,aabb);
-        float distance = Vector.GetDirectionVector(sphere.transform.position, closestPointBetweenSphereAndAabb).magnitude - sphere.radius;
+        SetClosestPointOnAABB(sphere,aabb);
+        float distance = (closestPoint - sphere.transform.position).magnitude - sphere.radius;
         if (distance < 0)
-        {
-            isSphereAndAabbColliding = true;
-        }
+            isColliding = true;
         else
-        {
-            isSphereAndAabbColliding = false;
-        }
+            isColliding = false;
     }
-    private void Seperate(PhysicsObject sphere, PhysicsObject Aabb)
+
+    private void Seperate(Sphere sphere, AABB aabb)
     {
-        directionBetweenSphereAndAabb = sphere.transform.position - closestPointBetweenSphereAndAabb;
-        Vector3 seperationPoint = closestPointBetweenSphereAndAabb + directionBetweenSphereAndAabb.normalized * (sphere.radius);
+        float newX = sphere.transform.position.x;
+        float newY = sphere.transform.position.y;
+        float newZ = sphere.transform.position.z;
+
+        directionBetweenSphereAndAabb = sphere.transform.position - closestPoint;
+        Vector3 seperationPoint = closestPoint + directionBetweenSphereAndAabb.normalized * (sphere.radius + 0.00001f) ;
         sphere.transform.position = seperationPoint;
     }
-    private void ApplyCollision(PhysicsObject sphere, PhysicsObject aabb)
+    private void ApplyCollision(Sphere sphere, AABB aabb)
     {
-        float CollisionForce = sphere.Speed * sphere.rb.mass;
-        Vector3 delta = sphere.transform.position - closestPointBetweenSphereAndAabb;
-        Vector3 normal = delta * CollisionForce;
-        sphere.rb.linearAcceleration = normal * sphere.rb.inverseMass;
+        float CollisionForce = sphere.rb.LinearVelocity.magnitude * sphere.rb.mass;
+        Vector3 delta = sphere.transform.position - closestPoint;
+        Vector3 normal = delta.normalized * CollisionForce;
+        sphere.rb.LinearVelocity = new Vector3(sphere.rb.LinearVelocity.x,normal.y,sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
     }
-    private void SetClosestPointBetweenSphereAndAabb(PhysicsObject sphere, PhysicsObject aabb)
+    private void SetClosestPointOnAABB(Sphere sphere, AABB aabb)
     {
-        //Matrix trs = Matrix.TRS(aabb.transform.position, aabb.transform.localEulerAngles, aabb.transform.lossyScale);
-        closestPointBetweenSphereAndAabb = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
-        closestPointBetweenSphereAndAabb = new Vector3(Mathf.Clamp(closestPointBetweenSphereAndAabb.x, -aabb.xHalfSize, aabb.xHalfSize), Mathf.Clamp(closestPointBetweenSphereAndAabb.y, -aabb.yHalfSize, aabb.yHalfSize), Mathf.Clamp(closestPointBetweenSphereAndAabb.z, -aabb.zHalfSize, aabb.zHalfSize));
-        //closestPointBetweenSphereAndAabb = trs * closestPointBetweenSphereAndAabb;
-        closestPointBetweenSphereAndAabb = aabb.transform.position + closestPointBetweenSphereAndAabb;
+        closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
+        closestPoint = new Vector3(Mathf.Clamp(closestPoint.x, -aabb.X_HalfSize, aabb.X_HalfSize), Mathf.Clamp(closestPoint.y, -aabb.Y_HalfSize, aabb.Y_HalfSize), Mathf.Clamp(closestPoint.z, -aabb.Z_HalfSize, aabb.Z_HalfSize));
+        closestPoint = aabb.transform.position + closestPoint;
     }
-
-    public void AddRigidbody(PhysicsObject physicsObject)
+    #endregion
+    
+    public void AddPhysicsObject(PhysicsObject physicsObject)
     {
         if (physicsObject == null)
             return;
@@ -146,23 +148,13 @@ public class UltimatePhysicsManager : MonoBehaviour
         physicalObjects.Add(physicsObject);
     }
 
-    public void RemoveRigidbody(PhysicsObject physicsObject)
+    public void RemovePhysicsObject(PhysicsObject physicsObject)
     {
         if (physicsObject == null)
             return;
         if (physicalObjects.Contains(physicsObject))
-            return;
-        physicalObjects.Add(physicsObject);
+            physicalObjects.Remove(physicsObject);
+          
     }
-    //private void OnDrawGizmos()
-    //{
-    //    Vector3 point;
-    //   // Matrix trs = Matrix.TRS(AABB.transform.position, AABB.transform.localEulerAngles, AABB.transform.lossyScale);
-    //    point = Vector.GetDirectionVector(AABB.transform.position, Sphere.transform.position);
-    //    point = new Vector3(Mathf.Clamp(point.x, -AABB.xHalfSize, AABB.xHalfSize), Mathf.Clamp(point.y, -AABB.yHalfSize, AABB.yHalfSize), Mathf.Clamp(point.z, -AABB.zHalfSize, AABB.zHalfSize));
-    //    // point = trs * point;
-    //    point = AABB.transform.position + point;
-    //    Gizmos.color = Color.red;
-    //    Gizmos.DrawSphere(point, 0.1f);
-    //}
+
 }

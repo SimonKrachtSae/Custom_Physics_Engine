@@ -21,7 +21,7 @@ public class ForceControl : MonoBehaviour
     {
         if(rb != null)
         {
-            rb.AddForce(Forces);
+            rb.LinearVelocity += Forces * rb.inverseMass;
             Forces = Vector3.zero;
         }
     }
