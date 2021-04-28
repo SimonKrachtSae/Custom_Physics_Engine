@@ -5,6 +5,8 @@ using CustomMath;
 
 public class MyRigidbody : MonoBehaviour
 {
+    public Vector3 AngularVelocity;
+
     [SerializeField]
     public float mass;
     [SerializeField]
@@ -21,7 +23,11 @@ public class MyRigidbody : MonoBehaviour
     public float inverseMass;
 
     public Vector3 LinearVelocity = new Vector3(0,0,0);
-
+    Vector3 rotation;
+    private void Awake()
+    {
+        rotation = transform.eulerAngles;
+    }
     private void FixedUpdate()
     {
         if (useGravity)
@@ -31,8 +37,8 @@ public class MyRigidbody : MonoBehaviour
         {
             transform.position += LinearVelocity * Time.deltaTime;
         }
-        //rotation += Mathf.Rad2Deg * angularAcceleration * Time.deltaTime;
-        //linearAcceleration = Vector3.zero;
+        rotation -= Mathf.Rad2Deg * AngularVelocity * Time.deltaTime;
+        transform.rotation = Quaternion.Euler(rotation);
         AddDrag();
     }
     private void AddDrag()

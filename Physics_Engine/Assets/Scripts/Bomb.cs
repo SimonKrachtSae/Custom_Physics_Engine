@@ -39,11 +39,11 @@ public class Bomb : MonoBehaviour
             }
             if (timeBeforeExplosion <= 0.0f)
             {
-                GetObjectsInRange();
                 timesUp = true;
             }
             if (timesUp)
             {
+                GetObjectsInRange();
                 timeBeforeDestroyed += Time.fixedDeltaTime;
             }
         }

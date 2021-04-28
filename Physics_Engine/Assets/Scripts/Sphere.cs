@@ -7,5 +7,4 @@ using System;
 public class Sphere : PhysicsObject
 {
     public float radius { get => transform.lossyScale.x / 2; }
-
 }

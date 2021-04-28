@@ -133,10 +133,26 @@ public class PhysicsManager : MonoBehaviour
         float CollisionForce = sphere.rb.LinearVelocity.magnitude * sphere.rb.mass;
         Vector3 delta = sphere.transform.position - closestPoint;
         Vector3 normal = delta.normalized * CollisionForce;
-        sphere.rb.LinearVelocity = new Vector3(sphere.rb.LinearVelocity.x,normal.y,sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
+        normal = new Vector3(sphere.rb.LinearVelocity.x, normal.y, sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
+        sphere.rb.LinearVelocity = normal * sphere.rb.inverseMass;
+        AddTorque(normal, sphere);
+    }
+    private void AddTorque(Vector3 force, Sphere sphere)
+    {
+        Vector3 distance = closestPoint - sphere.transform.position;
+        Vector3 torque = Vector3.Cross(distance, force);
+        sphere.rb.AngularVelocity = torque * sphere.rb.inverseMass;
+    }
+    public void AddForceAtPosition(Vector3 _force, Vector3 _position, ForceMode _mode)
+    {
+        Vector3 distance = _position - transform.position;
+        Vector3 torque = Vector3.Cross(distance, _force);
+
+        //AddTorque(torque);
+        //AddForce(_force, _mode);
     }
     #endregion
-    
+
     public void AddPhysicsObject(PhysicsObject physicsObject)
     {
         if (physicsObject == null)
