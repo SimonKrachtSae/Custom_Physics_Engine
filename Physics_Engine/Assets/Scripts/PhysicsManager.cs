@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using CustomMath;
-public class UltimatePhysicsManager : MonoBehaviour
+public class PhysicsManager : MonoBehaviour
 {
-    public static UltimatePhysicsManager Instance { get; private set; }
+    public static PhysicsManager Instance { get; private set; }
     public List<PhysicsObject> physicalObjects;
     private bool isColliding = false;
-    private Vector3 directionBetweenSphereAndAabb = new Vector3();
     private Vector3 closestPoint = new Vector3();
-
-    public Sphere Sphere;
-    public AABB AABB;
     private void Awake()
     {
 
@@ -48,6 +44,10 @@ public class UltimatePhysicsManager : MonoBehaviour
             }
             else if(b is Sphere)
             {
+                if(b.GetComponent<Bomb>())
+                {
+                    b.GetComponent<Bomb>().explode = true;
+                }
                 GenerateCollision((Sphere)a, (Sphere)b);
             }
         }
@@ -95,7 +95,7 @@ public class UltimatePhysicsManager : MonoBehaviour
     #region SphereToAABBCollision
     private void GenerateCollision(Sphere sphere, AABB aabb)
     {
-         isColliding = false;
+        isColliding = false;
         CheckForCollision(sphere,aabb);
         if (isColliding)
         {
@@ -112,15 +112,20 @@ public class UltimatePhysicsManager : MonoBehaviour
         else
             isColliding = false;
     }
-
+    private void SetClosestPointOnAABB(Sphere sphere, AABB aabb)
+    {
+        closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
+        closestPoint = new Vector3(Mathf.Clamp(closestPoint.x, -aabb.X_HalfSize, aabb.X_HalfSize), Mathf.Clamp(closestPoint.y, -aabb.Y_HalfSize, aabb.Y_HalfSize), Mathf.Clamp(closestPoint.z, -aabb.Z_HalfSize, aabb.Z_HalfSize));
+        closestPoint = aabb.transform.position + closestPoint;
+    }
     private void Seperate(Sphere sphere, AABB aabb)
     {
         float newX = sphere.transform.position.x;
         float newY = sphere.transform.position.y;
         float newZ = sphere.transform.position.z;
 
-        directionBetweenSphereAndAabb = sphere.transform.position - closestPoint;
-        Vector3 seperationPoint = closestPoint + directionBetweenSphereAndAabb.normalized * (sphere.radius + 0.00001f) ;
+        Vector3 direction = sphere.transform.position - closestPoint;
+        Vector3 seperationPoint = closestPoint + direction.normalized * (sphere.radius + 0.00001f) ;
         sphere.transform.position = seperationPoint;
     }
     private void ApplyCollision(Sphere sphere, AABB aabb)
@@ -129,12 +134,6 @@ public class UltimatePhysicsManager : MonoBehaviour
         Vector3 delta = sphere.transform.position - closestPoint;
         Vector3 normal = delta.normalized * CollisionForce;
         sphere.rb.LinearVelocity = new Vector3(sphere.rb.LinearVelocity.x,normal.y,sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
-    }
-    private void SetClosestPointOnAABB(Sphere sphere, AABB aabb)
-    {
-        closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
-        closestPoint = new Vector3(Mathf.Clamp(closestPoint.x, -aabb.X_HalfSize, aabb.X_HalfSize), Mathf.Clamp(closestPoint.y, -aabb.Y_HalfSize, aabb.Y_HalfSize), Mathf.Clamp(closestPoint.z, -aabb.Z_HalfSize, aabb.Z_HalfSize));
-        closestPoint = aabb.transform.position + closestPoint;
     }
     #endregion
     

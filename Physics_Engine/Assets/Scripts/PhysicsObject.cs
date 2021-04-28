@@ -14,10 +14,10 @@ public class PhysicsObject : MonoBehaviour
     }
     private void Start()
     {
-        UltimatePhysicsManager.Instance.AddPhysicsObject(this); 
+        PhysicsManager.Instance.AddPhysicsObject(this); 
     }
     private void OnDestroy()
     {
-        UltimatePhysicsManager.Instance.RemovePhysicsObject(this);
+        PhysicsManager.Instance.RemovePhysicsObject(this);
     }
 }
