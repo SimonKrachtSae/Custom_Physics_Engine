@@ -17,8 +17,6 @@ public class MyRigidbody : MonoBehaviour
     private float gravityScale = 1;
     [SerializeField]
     private bool isKinematic;
-    [SerializeField]
-    private bool isTrigger;
 
     public float inverseMass;
 

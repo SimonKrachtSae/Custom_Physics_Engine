@@ -6,8 +6,6 @@ public class PhysicsManager : MonoBehaviour
 {
     public static PhysicsManager Instance { get; private set; }
     public List<PhysicsObject> physicalObjects;
-    private bool isColliding = false;
-    private Vector3 closestPoint = new Vector3();
     private void Awake()
     {
 
@@ -26,7 +24,7 @@ public class PhysicsManager : MonoBehaviour
         {
             for(int j = i + 1; j < physicalObjects.Count; j++)
             {
-                closestPoint = Vector3.zero;
+                //closestPoint = Vector3.zero;
                 CheckForCollision(physicalObjects[i], physicalObjects[j]);
             }
         }
@@ -50,12 +48,23 @@ public class PhysicsManager : MonoBehaviour
                 }
                 GenerateCollision((Sphere)a, (Sphere)b);
             }
+            if(b is Plane)
+            {
+                GenerateCollision((Sphere)a, (Plane)b);
+            }
         }
         else if(a is AABB )
         {
             if(b is Sphere)
             {
                 GenerateCollision((Sphere)b, (AABB)a);
+            }
+        }
+        else if(a is Plane)
+        {
+            if(b is Sphere)
+            {
+                GenerateCollision((Sphere)b, (Plane)a);
             }
         }
     }
@@ -95,49 +104,47 @@ public class PhysicsManager : MonoBehaviour
     #region SphereToAABBCollision
     private void GenerateCollision(Sphere sphere, AABB aabb)
     {
-        isColliding = false;
-        CheckForCollision(sphere,aabb);
-        if (isColliding)
+        Vector3 closestPoint = new Vector3();
+        if (CheckForCollision(sphere, aabb,out closestPoint))
         {
-            Seperate(sphere, aabb);
-            ApplyCollision(sphere, aabb);
+            Seperate(sphere, aabb, closestPoint);
+            ApplyCollision(sphere, aabb, closestPoint);
         }
     }
-    private void CheckForCollision(Sphere sphere, AABB aabb)
+    private bool CheckForCollision(Sphere sphere, AABB aabb,out Vector3 closestPoint)
     {
-        SetClosestPointOnAABB(sphere,aabb);
+        closestPoint = GetClosestPointOnAABB(sphere,aabb);
         float distance = (closestPoint - sphere.transform.position).magnitude - sphere.radius;
         if (distance < 0)
-            isColliding = true;
+            return true;
         else
-            isColliding = false;
+            return false;
     }
-    private void SetClosestPointOnAABB(Sphere sphere, AABB aabb)
+    private Vector3 GetClosestPointOnAABB(Sphere sphere, AABB aabb)
     {
-        closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
+        Vector3 closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
         closestPoint = new Vector3(Mathf.Clamp(closestPoint.x, -aabb.X_HalfSize, aabb.X_HalfSize), Mathf.Clamp(closestPoint.y, -aabb.Y_HalfSize, aabb.Y_HalfSize), Mathf.Clamp(closestPoint.z, -aabb.Z_HalfSize, aabb.Z_HalfSize));
         closestPoint = aabb.transform.position + closestPoint;
+        return closestPoint;
     }
-    private void Seperate(Sphere sphere, AABB aabb)
+    private void Seperate(Sphere sphere, AABB aabb, Vector3 closestPoint)
     {
-        float newX = sphere.transform.position.x;
-        float newY = sphere.transform.position.y;
-        float newZ = sphere.transform.position.z;
 
         Vector3 direction = sphere.transform.position - closestPoint;
         Vector3 seperationPoint = closestPoint + direction.normalized * (sphere.radius + 0.00001f) ;
         sphere.transform.position = seperationPoint;
     }
-    private void ApplyCollision(Sphere sphere, AABB aabb)
+    private void ApplyCollision(Sphere sphere, AABB aabb, Vector3 closestPoint)
     {
         float CollisionForce = sphere.rb.LinearVelocity.magnitude * sphere.rb.mass;
         Vector3 delta = sphere.transform.position - closestPoint;
         Vector3 normal = delta.normalized * CollisionForce;
-        normal = new Vector3(sphere.rb.LinearVelocity.x, normal.y, sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
-        sphere.rb.LinearVelocity = normal * sphere.rb.inverseMass;
-        AddTorque(normal, sphere);
+        //normal = new Vector3(sphere.rb.LinearVelocity.x, normal.y, sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
+        normal = normal * 1.5f * sphere.rb.inverseMass;
+        sphere.rb.LinearVelocity += normal * sphere.rb.inverseMass;
+        AddTorque(normal, sphere, closestPoint);
     }
-    private void AddTorque(Vector3 force, Sphere sphere)
+    private void AddTorque(Vector3 force, Sphere sphere, Vector3 closestPoint)
     {
         Vector3 distance = closestPoint - sphere.transform.position;
         Vector3 torque = Vector3.Cross(distance, force);
@@ -152,7 +159,36 @@ public class PhysicsManager : MonoBehaviour
         //AddForce(_force, _mode);
     }
     #endregion
-
+    #region SphereToPlaneCollision
+    private void GenerateCollision(Sphere sphere, Plane plane)
+    {
+        CheckDistance(sphere, plane);
+    }
+    private void CheckDistance(Sphere sphere, Plane plane)
+    {
+        Vector3 normal = plane.transform.up;
+        float distance = Vector.Dot(normal, sphere.transform.position - plane.transform.position);
+        distance -= sphere.radius;
+        Vector3 closestPoint = sphere.transform.position + sphere.radius * (-plane.transform.up);
+        Vector3 closestPointOnPlane = Vector.ProjectOnPlane(closestPoint, plane.transform.position + plane.transform.up);
+        if (distance <= 0)
+        {
+            Seperate(sphere, plane, closestPointOnPlane);
+            ApplyCollision(sphere,plane, closestPointOnPlane, closestPoint);
+        }
+    }
+    private void Seperate(Sphere sphere,Plane plane, Vector3 closestPointOnPlane)
+    {
+        sphere.transform.position = closestPointOnPlane + plane.transform.up.normalized * (sphere.radius + 0.05f);
+    }
+    private void ApplyCollision(Sphere sphere, Plane plane,Vector3 normal, Vector3 closestPoint)
+    {
+        float collisionForce = sphere.rb.LinearVelocity.magnitude * sphere.rb.mass;
+        Vector3 force = plane.transform.up * collisionForce;
+        sphere.rb.LinearVelocity += force;
+        AddTorque(sphere.rb.LinearVelocity , sphere, closestPoint);
+    }
+    #endregion
     public void AddPhysicsObject(PhysicsObject physicsObject)
     {
         if (physicsObject == null)
