@@ -22,7 +22,7 @@ public class SphereSpawner : MonoBehaviour
             {
                 SpawnSphere();
             }
-            else if(rand > 7)
+            else if(rand >= 6)
             {
                 SpawnBomb();
             }
@@ -37,7 +37,6 @@ public class SphereSpawner : MonoBehaviour
         sphere.GetComponent<MyRigidbody>().mass = f;
         sphere.GetComponent<Sphere>().SetScale(f);
         sphere.GetComponent<Sphere>().bounciness = Random.Range(0.5f, 1f);
-        sphere = new GameObject();
     }
     void SpawnBomb()
     {

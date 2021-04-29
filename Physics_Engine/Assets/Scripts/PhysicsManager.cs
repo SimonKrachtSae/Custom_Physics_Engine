@@ -32,8 +32,8 @@ public class PhysicsManager : MonoBehaviour
     }
     private void CheckForCollision(PhysicsObject a, PhysicsObject b)
     {
-        if (a.isTrigger || b.isTrigger)
-            return;
+            if (a.isTrigger || b.isTrigger)
+                return;
         if(a is Sphere)
         {
             if(b is AABB)
@@ -112,6 +112,9 @@ public class PhysicsManager : MonoBehaviour
         Vector3 closestPoint;
         if (CheckDistance(sphere, aabb, out closestPoint))
         {
+            if (aabb.GetComponent<Arena>())
+                return;
+
             Seperate(sphere, aabb, closestPoint);
             ApplyCollision(sphere, aabb, closestPoint);
         }

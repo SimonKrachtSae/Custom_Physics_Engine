@@ -56,12 +56,15 @@ public class Bomb : MonoBehaviour
     {
         for(int i = 0; i < PhysicsManager.Instance.physicalObjects.Count; i++)
         {
-            float distance = (transform.position - PhysicsManager.Instance.physicalObjects[i].rb.transform.position).magnitude - thisSphere.radius; 
-            if(distance < explosionRadius)
+            if (PhysicsManager.Instance.physicalObjects[i] != null)
             {
-                if(PhysicsManager.Instance.physicalObjects[i] != this)
+                float distance = (transform.position - PhysicsManager.Instance.physicalObjects[i].rb.transform.position).magnitude - thisSphere.radius; 
+                if(distance < explosionRadius)
                 {
-                    AddExplosionForce(PhysicsManager.Instance.physicalObjects[i]);
+                    if(PhysicsManager.Instance.physicalObjects[i] != this)
+                    {
+                        AddExplosionForce(PhysicsManager.Instance.physicalObjects[i]);
+                    }
                 }
             }
         }
