@@ -20,8 +20,8 @@ public class PlanePhysicsManager : MonoBehaviour
         normal = plane.transform.up;
         distance = Vector.Dot(normal, sphere.transform.position -plane.transform.position);
         distance -= sphere.radius;
-        closestPoint = sphere.transform.position + sphere.radius * (-plane.transform.up);
-        closestPointOnPlane = Vector.ProjectOnPlane(closestPoint, plane.transform.up) + plane.transform.position;
+        closestPoint = sphere.transform.position + sphere.radius * (-normal);
+        closestPointOnPlane = Vector.ProjectOnPlane(closestPoint, normal);
         if(distance <= 0)
         {
             Seperate();
@@ -37,7 +37,7 @@ public class PlanePhysicsManager : MonoBehaviour
     {
         CheckDistance();
         Gizmos.color = Color.red;
-        //Gizmos.DrawLine(plane.transform.position,normal);
+        Gizmos.DrawLine(plane.transform.position,normal);
         Gizmos.DrawSphere(closestPoint, 0.1f);
 
         Gizmos.color = Color.green;

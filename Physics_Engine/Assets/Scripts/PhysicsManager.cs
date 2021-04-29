@@ -33,7 +33,6 @@ public class PhysicsManager : MonoBehaviour
     {
         if (a.isTrigger || b.isTrigger)
             return;
-
         if(a is Sphere)
         {
             if(b is AABB)
@@ -42,10 +41,6 @@ public class PhysicsManager : MonoBehaviour
             }
             else if(b is Sphere)
             {
-                if(b.GetComponent<Bomb>())
-                {
-                    b.GetComponent<Bomb>().explode = true;
-                }
                 GenerateCollision((Sphere)a, (Sphere)b);
             }
             if(b is Plane)
@@ -67,6 +62,7 @@ public class PhysicsManager : MonoBehaviour
                 GenerateCollision((Sphere)b, (Plane)a);
             }
         }
+
     }
 
     #region SphereToShereCollision
@@ -78,10 +74,18 @@ public class PhysicsManager : MonoBehaviour
     private void CheckDistance(Sphere a, Sphere b,Vector3 direction)
     {
         float middlepointDistance = direction.magnitude;
-        float realDistance = middlepointDistance - a.radius - b.radius;
-        
-        if (realDistance < 0)
+        float distance = middlepointDistance - a.radius - b.radius;
+
+        if (distance < 0)
         {
+            if (b.GetComponent<Bomb>())
+            {
+                b.GetComponent<Bomb>().explode = true;
+            }
+            else if (a.GetComponent<Bomb>())
+            {
+                a.GetComponent<Bomb>().explode = true;
+            }
             Seperate(a, b, direction);
             ApplyCollision(a, b, direction);
         }
@@ -93,7 +97,7 @@ public class PhysicsManager : MonoBehaviour
     }
     private void ApplyCollision(Sphere a, Sphere b, Vector3 direction)
     {
-        float collisionForce = a.rb.LinearVelocity.magnitude * a.rb.mass + b.rb.LinearVelocity.magnitude * b.rb.mass;
+        float collisionForce = a.rb.LinearVelocity.magnitude * a.rb.mass * a.bounciness + b.rb.LinearVelocity.magnitude * b.rb.mass * b.bounciness;
         Vector3 delta = (direction + a.rb.LinearVelocity + b.rb.LinearVelocity).normalized;
         Vector3 normal = delta * collisionForce;
         a.rb.LinearVelocity = -normal * a.rb.inverseMass;
@@ -105,13 +109,13 @@ public class PhysicsManager : MonoBehaviour
     private void GenerateCollision(Sphere sphere, AABB aabb)
     {
         Vector3 closestPoint = new Vector3();
-        if (CheckForCollision(sphere, aabb,out closestPoint))
+        if (CheckDistance(sphere, aabb, out closestPoint))
         {
             Seperate(sphere, aabb, closestPoint);
             ApplyCollision(sphere, aabb, closestPoint);
         }
     }
-    private bool CheckForCollision(Sphere sphere, AABB aabb,out Vector3 closestPoint)
+    private bool CheckDistance(Sphere sphere, AABB aabb,out Vector3 closestPoint)
     {
         closestPoint = GetClosestPointOnAABB(sphere,aabb);
         float distance = (closestPoint - sphere.transform.position).magnitude - sphere.radius;
@@ -124,7 +128,7 @@ public class PhysicsManager : MonoBehaviour
     {
         Vector3 closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
         closestPoint = new Vector3(Mathf.Clamp(closestPoint.x, -aabb.X_HalfSize, aabb.X_HalfSize), Mathf.Clamp(closestPoint.y, -aabb.Y_HalfSize, aabb.Y_HalfSize), Mathf.Clamp(closestPoint.z, -aabb.Z_HalfSize, aabb.Z_HalfSize));
-        closestPoint = aabb.transform.position + closestPoint;
+        closestPoint = aabb.transform.position + closestPoint ;
         return closestPoint;
     }
     private void Seperate(Sphere sphere, AABB aabb, Vector3 closestPoint)
@@ -140,7 +144,8 @@ public class PhysicsManager : MonoBehaviour
         Vector3 delta = sphere.transform.position - closestPoint;
         Vector3 normal = delta.normalized * CollisionForce;
         //normal = new Vector3(sphere.rb.LinearVelocity.x, normal.y, sphere.rb.LinearVelocity.z) * sphere.rb.inverseMass;
-        normal = normal * 1.5f * sphere.rb.inverseMass;
+
+        normal = normal * sphere.bounciness * sphere.rb.inverseMass;
         sphere.rb.LinearVelocity += normal * sphere.rb.inverseMass;
         AddTorque(normal, sphere, closestPoint);
     }
@@ -169,12 +174,12 @@ public class PhysicsManager : MonoBehaviour
         Vector3 normal = plane.transform.up;
         float distance = Vector.Dot(normal, sphere.transform.position - plane.transform.position);
         distance -= sphere.radius;
-        Vector3 closestPoint = sphere.transform.position + sphere.radius * (-plane.transform.up);
-        Vector3 closestPointOnPlane = Vector.ProjectOnPlane(closestPoint, plane.transform.position + plane.transform.up);
+        Vector3 closestPointOnSphere = sphere.transform.position + sphere.radius * (-plane.transform.up);
+        Vector3 closestPointOnPlane = Vector.ProjectOnPlane(closestPointOnSphere,plane.transform.up);
         if (distance <= 0)
         {
             Seperate(sphere, plane, closestPointOnPlane);
-            ApplyCollision(sphere,plane, closestPointOnPlane, closestPoint);
+            ApplyCollision(sphere,plane, closestPointOnPlane, closestPointOnSphere);
         }
     }
     private void Seperate(Sphere sphere,Plane plane, Vector3 closestPointOnPlane)
