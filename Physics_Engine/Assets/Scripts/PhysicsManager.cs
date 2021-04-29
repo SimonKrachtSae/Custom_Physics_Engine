@@ -69,7 +69,7 @@ public class PhysicsManager : MonoBehaviour
     #region SphereToShereCollision
     private void GenerateCollision(Sphere a, Sphere b)
     {
-        Vector3 direction = Vector.GetDirectionVector(a.transform.position,b.transform.position);
+        Vector3 direction = b.transform.position - a.transform.position;
         CheckDistance(a,b, direction);
     }
     private void CheckDistance(Sphere a, Sphere b,Vector3 direction)
@@ -141,7 +141,7 @@ public class PhysicsManager : MonoBehaviour
     }
     private Vector3 GetClosestPointOnAABB(Sphere sphere, AABB aabb)
     {
-        Vector3 closestPoint = Vector.GetDirectionVector(aabb.transform.position, sphere.transform.position);
+        Vector3 closestPoint = sphere.transform.position - aabb.transform.position;
         closestPoint = new Vector3(Mathf.Clamp(closestPoint.x, -aabb.X_HalfSize, aabb.X_HalfSize), Mathf.Clamp(closestPoint.y, -aabb.Y_HalfSize, aabb.Y_HalfSize), Mathf.Clamp(closestPoint.z, -aabb.Z_HalfSize, aabb.Z_HalfSize));
         closestPoint = aabb.transform.position + closestPoint ;
         return closestPoint;

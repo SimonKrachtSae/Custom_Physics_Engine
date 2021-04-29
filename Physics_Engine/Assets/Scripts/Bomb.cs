@@ -6,15 +6,16 @@ using UnityEngine;
 public class Bomb : MonoBehaviour
 {
     private Sphere thisSphere;
+    private MeshRenderer meshRenderer;
+
     [SerializeField] private float explosionRadius;
-    public List<PhysicsObject> objectsInRange = new List<PhysicsObject>();
-    public bool explode = false;
     [SerializeField] private float explosionForce;
+
+    public bool explode = false;
 
     private float timeBeforeDestroyed = 0.0f;
     private float timeBeforeExplosion = 5.0f;
     bool timesUp = false;
-    private MeshRenderer meshRenderer;
     private void Start()
     {
         thisSphere = GetComponent<Sphere>();

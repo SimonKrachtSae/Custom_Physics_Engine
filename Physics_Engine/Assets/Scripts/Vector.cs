@@ -46,10 +46,7 @@ namespace CustomMath
 
             return v;
         }
-        public static Vector3 GetDirectionVector(Vector3 a, Vector3 b)
-        {
-            return b - a;
-        }
+
         public static Vector operator / (Vector v, float f)
         {
             return new Vector(v.X / f, v.Y / f, v.Z / f);
