@@ -18,11 +18,11 @@ public class SphereSpawner : MonoBehaviour
         if(timeUntilNextSpawn <= 0)
         {
             int rand = Random.Range(0, 10);
-            if (rand < 5)
+            if (rand < 6)
             {
                 SpawnSphere();
             }
-            else if(rand > 5)
+            else if(rand > 7)
             {
                 SpawnBomb();
             }
@@ -31,7 +31,7 @@ public class SphereSpawner : MonoBehaviour
     }
     void SpawnSphere()
     {
-        int rand = Mathf.RoundToInt(Random.Range(0f, spawnPoints.Count));
+        int rand = Random.Range(0, spawnPoints.Count-1);
         GameObject sphere = Instantiate(spherePrefab, spawnPoints[rand].position, Quaternion.identity);
         float f = Random.Range(1f, 2f);
         sphere.GetComponent<MyRigidbody>().mass = f;
@@ -41,7 +41,7 @@ public class SphereSpawner : MonoBehaviour
     }
     void SpawnBomb()
     {
-        int rand = Mathf.RoundToInt(Random.Range(0f, spawnPoints.Count));
+        int rand = Mathf.RoundToInt(Random.Range(0f, spawnPoints.Count-1));
         Instantiate(bombPrefab, spawnPoints[rand].position, Quaternion.identity);
     }
 }

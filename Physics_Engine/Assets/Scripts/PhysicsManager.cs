@@ -6,6 +6,7 @@ public class PhysicsManager : MonoBehaviour
 {
     public static PhysicsManager Instance { get; private set; }
     public List<PhysicsObject> physicalObjects;
+
     private void Awake()
     {
 
@@ -108,7 +109,7 @@ public class PhysicsManager : MonoBehaviour
     #region SphereToAABBCollision
     private void GenerateCollision(Sphere sphere, AABB aabb)
     {
-        Vector3 closestPoint = new Vector3();
+        Vector3 closestPoint;
         if (CheckDistance(sphere, aabb, out closestPoint))
         {
             Seperate(sphere, aabb, closestPoint);
@@ -119,6 +120,17 @@ public class PhysicsManager : MonoBehaviour
     {
         closestPoint = GetClosestPointOnAABB(sphere,aabb);
         float distance = (closestPoint - sphere.transform.position).magnitude - sphere.radius;
+
+        if(aabb.GetComponent<Arena>())
+        {
+            if(distance > 0)
+            {
+                RemovePhysicsObject(sphere);
+                Destroy(sphere.gameObject);
+                Debug.Log("cheese");
+            }
+        }
+
         if (distance < 0)
             return true;
         else
@@ -210,6 +222,7 @@ public class PhysicsManager : MonoBehaviour
             return;
         if (physicalObjects.Contains(physicsObject))
             physicalObjects.Remove(physicsObject);
+        Destroy(physicsObject);
           
     }
 
