@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(AABB))]
-public class Arena : MonoBehaviour
+[RequireComponent(typeof(AABB_Collider))]
+public class WorldBounds : MonoBehaviour
 {
     private void OnDrawGizmos()
     {

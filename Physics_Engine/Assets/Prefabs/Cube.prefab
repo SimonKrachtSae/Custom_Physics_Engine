@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 7074594892333084766}
   - component: {fileID: 7074594892333084767}
   - component: {fileID: 7074594892333084764}
-  - component: {fileID: 7074594892333084763}
   - component: {fileID: 7074594892333084760}
+  - component: {fileID: 3459032919113473623}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -97,23 +97,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7074594892333084763
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7074594892333084765}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26da08862377ef24b862c99a4e63f62b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  closestPoint: {x: 0, y: 0, z: 0}
-  distanceBetweenPoints: 0
-  Speed: 0
-  MoveDir: {x: 0, y: 0, z: 0}
-  rb: {fileID: 7074594892333084760}
 --- !u!114 &7074594892333084760
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,11 +109,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e8dac09e28ed0e44b997cc7834ae010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 1
-  Drag: 0
-  inverseMass: 1
-  linearAcceleration: {x: 0, y: 0, z: 0}
-  angularAcceleration: {x: 0, y: 0, z: 0}
-  angularVelocity: {x: 0, y: 0, z: 0}
-  gravityScale: 1
+  AngularVelocity: {x: 0, y: 0, z: 0}
+  Mass: 1
+  drag: 0
   useGravity: 0
+  gravityScale: 1
+  isKinematic: 0
+  LinearVelocity: {x: 0, y: 0, z: 0}
+--- !u!114 &3459032919113473623
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7074594892333084765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d71fb27e8d72954b98c54f4ae86cb22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  isTrigger: 0

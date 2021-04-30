@@ -6,9 +6,10 @@ using CustomMath;
 public class MyRigidbody : MonoBehaviour
 {
     public Vector3 AngularVelocity;
+    public Vector3 LinearVelocity = new Vector3(0,0,0);
 
     [SerializeField]
-    public float mass;
+    public float Mass;
     [SerializeField]
     private float drag;
     [SerializeField]
@@ -17,11 +18,10 @@ public class MyRigidbody : MonoBehaviour
     private float gravityScale = 1;
     [SerializeField]
     private bool isKinematic;
+    public float InverseMass {get => 1/Mass; }
 
-    public float inverseMass;
+    private Vector3 rotation;
 
-    public Vector3 LinearVelocity = new Vector3(0,0,0);
-    Vector3 rotation;
     private void Awake()
     {
         rotation = transform.eulerAngles;
@@ -48,11 +48,10 @@ public class MyRigidbody : MonoBehaviour
     }
     private void OnValidate()
     {
-        if (mass <= 0)
+        if (Mass <= 0)
         {
-            mass = 1e-7f;
+            Mass = 1e-7f;
         }
-        inverseMass = 1.0f / mass;
         drag = Mathf.Clamp(drag, 0.0f, 1.0f);
         gravityScale = Mathf.Clamp(gravityScale, 0.0f, 1.0f);
     }

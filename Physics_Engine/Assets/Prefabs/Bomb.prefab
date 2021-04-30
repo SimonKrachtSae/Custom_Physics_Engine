@@ -12,10 +12,9 @@ GameObject:
   - component: {fileID: 8995170108557183817}
   - component: {fileID: 8995170108557183830}
   - component: {fileID: 8995170108557183831}
-  - component: {fileID: 8995170108557183828}
-  - component: {fileID: 8995170108557183829}
-  - component: {fileID: 8995170108557183819}
   - component: {fileID: 8995170108557183826}
+  - component: {fileID: 8995170108557183828}
+  - component: {fileID: 1186964590473694395}
   m_Layer: 0
   m_Name: Bomb
   m_TagString: Untagged
@@ -99,53 +98,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8995170108557183828
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8995170108557183827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e8dac09e28ed0e44b997cc7834ae010, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mass: 1
-  drag: 1
-  useGravity: 1
-  gravityScale: 1
-  isKinematic: 0
-  isTrigger: 0
-  inverseMass: 1
-  LinearVelocity: {x: 0, y: 0, z: 0}
---- !u!114 &8995170108557183829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8995170108557183827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c3b64f5282023e847a5b0a06ccb8716e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Forces: {x: 0, y: 0, z: 0}
---- !u!114 &8995170108557183819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8995170108557183827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca9bfad066ffeb043b89f4455bf42ba2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 0}
-  isTrigger: 0
 --- !u!114 &8995170108557183826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,6 +111,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   explosionRadius: 10
-  objectsInRange: []
-  explode: 0
   explosionForce: 2
+  Explode: 0
+--- !u!114 &8995170108557183828
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8995170108557183827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e8dac09e28ed0e44b997cc7834ae010, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AngularVelocity: {x: 0, y: 0, z: 0}
+  Mass: 1
+  drag: 1
+  useGravity: 1
+  gravityScale: 1
+  isKinematic: 0
+  LinearVelocity: {x: 0, y: 0, z: 0}
+--- !u!114 &1186964590473694395
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8995170108557183827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d41fbee4ca77c840832efb916e69b82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  isTrigger: 0
+  Bounciness: 0.5

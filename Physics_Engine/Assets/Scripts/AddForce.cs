@@ -4,15 +4,13 @@ using UnityEngine;
 using CustomMath;
 
 [RequireComponent(typeof(MyRigidbody))]
-public class ForceControl : MonoBehaviour
+public class AddForce : MonoBehaviour
 {
 
-    public Vector3 Forces;
+    [SerializeField] private Vector3 forces;
 
     private MyRigidbody rb;
-    private void OnValidate()
-    {
-    }
+
     private void Awake()
     {
         rb = GetComponent<MyRigidbody>();
@@ -21,8 +19,8 @@ public class ForceControl : MonoBehaviour
     {
         if(rb != null)
         {
-            rb.LinearVelocity += Forces * rb.inverseMass;
-            Forces = Vector3.zero;
+            rb.LinearVelocity += forces * rb.InverseMass;
+            forces = Vector3.zero;
         }
     }
 

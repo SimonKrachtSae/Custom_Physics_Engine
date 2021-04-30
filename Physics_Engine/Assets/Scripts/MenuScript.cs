@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 public class MenuScript : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenu;
-    private bool GameIsPaused;
 
     public void StartGame()
     {
@@ -19,15 +18,11 @@ public class MenuScript : MonoBehaviour
     }
     public void Resume()
     {
-        pauseMenu.SetActive(false);
         Time.timeScale = 1f;
-        GameIsPaused = false;
     }
-    void Pause()
+    public void Pause()
     {
-        pauseMenu.SetActive(true);
-        Time.timeScale = 0.1f;
-        GameIsPaused = true;
+        Time.timeScale = 0f;
     }
     public void Restart()
     {

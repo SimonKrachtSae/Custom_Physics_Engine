@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AABB : PhysicsObject
+public class AABB_Collider : Collider
 {
     public float X_Size { get => transform.lossyScale.x; }
     public float Y_Size { get => transform.lossyScale.y; }

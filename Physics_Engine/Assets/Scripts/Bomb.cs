@@ -2,29 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Sphere))]
 public class Bomb : MonoBehaviour
 {
-    private Sphere thisSphere;
+    private SphereCollider thisSphere;
     private MeshRenderer meshRenderer;
 
     [SerializeField] private float explosionRadius;
     [SerializeField] private float explosionForce;
 
-    public bool explode = false;
+    public bool Explode = false;
 
     private float timeBeforeDestroyed = 0.0f;
     private float timeBeforeExplosion = 5.0f;
-    bool timesUp = false;
+    private bool timesUp = false;
     private void Start()
     {
-        thisSphere = GetComponent<Sphere>();
+        thisSphere = GetComponent<SphereCollider>();
         meshRenderer = GetComponent<MeshRenderer>();
     }
     private void Update()
     {
         //GetObjectsInRange();
-        if(explode)
+        if(Explode)
         {
             timeBeforeExplosion -= Time.deltaTime;
             if (Mathf.Round(timeBeforeExplosion) % 1 == 0 && timeBeforeExplosion != 0.0f)
@@ -59,7 +58,7 @@ public class Bomb : MonoBehaviour
         {
             if (PhysicsManager.Instance.physicalObjects[i] != null)
             {
-                float distance = (transform.position - PhysicsManager.Instance.physicalObjects[i].rb.transform.position).magnitude - thisSphere.radius; 
+                float distance = (transform.position - PhysicsManager.Instance.physicalObjects[i].rb.transform.position).magnitude - thisSphere.Radius; 
                 if(distance < explosionRadius)
                 {
                     if(PhysicsManager.Instance.physicalObjects[i] != this)
@@ -70,11 +69,20 @@ public class Bomb : MonoBehaviour
             }
         }
     }
-    void AddExplosionForce(PhysicsObject physicsObject)
+    void AddExplosionForce(Collider physicsObject)
     {
         Vector3 direction = transform.position - physicsObject.transform.position;
-        float newDistance = direction.magnitude - thisSphere.radius;
+        float newDistance = direction.magnitude - thisSphere.Radius;
         direction = direction.normalized;
-        physicsObject.rb.LinearVelocity -= (direction * explosionForce) * physicsObject.rb.inverseMass;
+        Vector3 newForce = (direction * explosionForce) * physicsObject.rb.InverseMass;
+        physicsObject.rb.LinearVelocity -= newForce;
+        if(physicsObject is SphereCollider)
+        AddTorque(newForce, physicsObject, direction);
+    }
+    private void AddTorque(Vector3 force, Collider sphere, Vector3 closestPoint)
+    {
+        Vector3 distance = closestPoint - sphere.transform.position;
+        Vector3 torque = Vector3.Cross(distance, force);
+        sphere.rb.AngularVelocity = torque * sphere.rb.InverseMass;
     }
 }

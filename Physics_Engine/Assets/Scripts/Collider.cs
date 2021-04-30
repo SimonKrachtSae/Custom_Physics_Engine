@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CustomMath;
 
-public class PhysicsObject : MonoBehaviour
+public class Collider : MonoBehaviour
 {
     public MyRigidbody rb;
     public bool isTrigger;

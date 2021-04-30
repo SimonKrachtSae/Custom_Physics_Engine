@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1550369721935876665}
   - component: {fileID: 1550369721935876666}
   - component: {fileID: 1550369721935876667}
-  - component: {fileID: 1550369721935876660}
+  - component: {fileID: 5703787831342724797}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -111,12 +111,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AngularVelocity: {x: 0, y: 0, z: 0}
-  mass: 1
+  Mass: 0.0000001
   drag: 1
   useGravity: 1
   gravityScale: 1
   isKinematic: 0
-  inverseMass: 1
   LinearVelocity: {x: 0, y: 0, z: 0}
 --- !u!114 &1550369721935876667
 MonoBehaviour:
@@ -131,7 +130,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Forces: {x: 0, y: 0, z: 0}
---- !u!114 &1550369721935876660
+--- !u!114 &5703787831342724797
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -140,9 +139,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1550369721935876661}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ca9bfad066ffeb043b89f4455bf42ba2, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d41fbee4ca77c840832efb916e69b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 1550369721935876666}
+  rb: {fileID: 0}
   isTrigger: 0
-  bounciness: 0
+  Bounciness: 1
